@@ -92,3 +92,10 @@ export namespace User {
 		children?: ResDepartment[];
 	}
 }
+
+// 注册组件
+export interface RegisterComponents {
+	componentPath: string;
+	name: string;
+	title: string;
+}

@@ -45,7 +45,7 @@
 			<el-button type="primary">保存草稿</el-button>
 			<el-button type="primary">生成</el-button>
 		</div>
-		<ViewDialog :value="showViewDialog" @input="$event => (showViewDialog = $event)" />
+		<ViewDialog ref="viewDialog" />
 	</div>
 </template>
 
@@ -55,9 +55,9 @@ import ViewDialog from "./ViewDialog.vue";
 const routeInfoFrom = ref({
 	isCreateRoute: "1"
 });
-const showViewDialog = ref(false);
+const viewDialog = ref(null);
 const editViewInfo = () => {
-	showViewDialog.value = true;
+	viewDialog.value.handleOpen();
 };
 </script>
 
