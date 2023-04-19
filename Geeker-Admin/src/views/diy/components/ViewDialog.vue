@@ -11,7 +11,7 @@
 										<span>组件</span>
 									</div>
 								</template>
-								<component v-for="(item, index) in registerComponentsList" :key="index" :is="item.name" />
+								<RegisterComponents />
 							</el-card>
 						</el-col>
 						<el-col :span="12">
@@ -40,8 +40,8 @@
 </template>
 
 <script setup>
-import { ref, createApp, onMounted } from "vue";
-import { getRegisterComponents } from "@/api/modules/common";
+import RegisterComponents from "@/components/RegisterComponents/index.vue";
+import { ref } from "vue";
 const value = ref(false);
 const handleOpen = () => {
 	value.value = true;
@@ -49,27 +49,7 @@ const handleOpen = () => {
 const handleClose = () => {
 	value.value = false;
 };
-const registerComponentsList = ref([]);
-const componentList = import.meta.globEager("@/components/RegisterComponents/**");
-let componentArray = new Object();
-Object.keys(componentList).forEach(key => {
-	let keyArray = key.split("/");
-	let name = keyArray[keyArray.length - 1].split(".")[0];
-	componentArray[name] = componentList[key].default;
-});
 
-Object.keys(componentArray).forEach(key => {
-	createApp({
-		component: {
-			key: componentArray[key]
-		}
-	});
-});
-onMounted(() => {
-	getRegisterComponents().then(res => {
-		registerComponentsList.value = res.data;
-	});
-});
 defineExpose({
 	handleOpen
 });

@@ -1,6 +1,5 @@
 <template>
-	<el-input>123</el-input>
-	123
+	<el-input></el-input>
 </template>
 
 <script setup></script>
