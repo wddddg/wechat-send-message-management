@@ -5,14 +5,38 @@
 				<GridItem v-for="(item, index) in pageInfo.header" :key="index" v-bind="getResponsive(item)">
 					<!-- <el-row class="card" :gutter="pageInfo.headerGutter">
 						<el-col :span="item.span" v-for="(item, index) in pageInfo.header" :key="index"> -->
-					<component
-						:is="componentArray[item.component]"
-						v-bind="item.props"
-						v-model="item.props.vModel"
-						:class="item.className"
-					></component>
+					<component :is="componentArray[item.component]" v-bind="item.props" v-model="item.props.vModel" :class="item.className">
+					</component>
 					<!-- </el-col>
 					</el-row> -->
+				</GridItem>
+				<GridItem suffix v-if="pageInfo.headerBtnOptShow">
+					<div class="operation">
+						<div v-if="pageInfo.headerBtnOpt?.preBtnSlot.length">
+							<div v-for="(item, index) in pageInfo.headerBtnOpt?.preBtnSlot" :key="index">
+								<component :is="componentArray[item.component]" v-bind="item.props" :class="item.className"></component>
+							</div>
+						</div>
+						<el-button
+							:type="pageInfo.headerBtnOpt?.defaultSearchBtnTheme"
+							:icon="Search"
+							@click="search"
+							v-if="pageInfo.headerBtnOpt?.defaultSearchBtnShow"
+							>{{ pageInfo.headerBtnOpt?.defaultSearchBtnText }}</el-button
+						>
+						<el-button
+							:type="pageInfo.headerBtnOpt?.defaultResetBtnTheme"
+							:icon="Delete"
+							@click="reset"
+							v-if="pageInfo.headerBtnOpt?.defaultResetShow"
+							>{{ pageInfo.headerBtnOpt?.defaultResetBtnText }}</el-button
+						>
+						<div v-if="pageInfo.headerBtnOpt?.nextBtnSlot.length">
+							<div v-for="(item, index) in pageInfo.headerBtnOpt?.nextBtnSlot" :key="index">
+								<component :is="componentArray[item.component]" v-bind="item.props" :class="item.className"></component>
+							</div>
+						</div>
+					</div>
 				</GridItem>
 			</Grid>
 		</div>
@@ -25,6 +49,7 @@ import { useRoute } from "vue-router";
 import { getPageInfoById } from "@/api/modules/common";
 import Grid from "@/components/Grid/index.vue";
 import GridItem from "@/components/Grid/components/GridItem.vue";
+import { Delete, Search } from "@element-plus/icons-vue";
 
 const id = useRoute()?.meta?.generatePagesId;
 const pageInfo = ref({});
