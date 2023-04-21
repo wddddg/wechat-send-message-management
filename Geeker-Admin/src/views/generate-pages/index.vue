@@ -3,12 +3,8 @@
 		<div v-if="pageInfo.isShowHeader" class="card">
 			<Grid ref="gridRef" :gap="[pageInfo.headerGutter, 0]" :cols="24">
 				<GridItem v-for="(item, index) in pageInfo.header" :key="index" v-bind="getResponsive(item)">
-					<!-- <el-row class="card" :gutter="pageInfo.headerGutter">
-						<el-col :span="item.span" v-for="(item, index) in pageInfo.header" :key="index"> -->
 					<component :is="componentArray[item.component]" v-bind="item.props" v-model="item.props.vModel" :class="item.className">
 					</component>
-					<!-- </el-col>
-					</el-row> -->
 				</GridItem>
 				<GridItem suffix v-if="pageInfo.headerBtnOptShow">
 					<div class="operation">
@@ -40,6 +36,7 @@
 				</GridItem>
 			</Grid>
 		</div>
+		<div v-if="pageInfo.isShowMain"></div>
 	</div>
 </template>
 
