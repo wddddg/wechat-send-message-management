@@ -30,11 +30,21 @@ export namespace Upload {
   }
 }
 
+// 获取验证码
+export namespace GetCodeImg {
+  export interface ResCodeImg {
+    img: string;
+    uuid: string;
+  }
+}
+
 // 登录模块
 export namespace Login {
   export interface ReqLoginForm {
     username: string;
     password: string;
+    code: string;
+    uuid: string;
   }
   export interface ResLogin {
     access_token: string;

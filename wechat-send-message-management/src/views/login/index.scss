@@ -70,6 +70,16 @@
   }
 }
 
+.login-code {
+  display: inline-block;
+  right: 0;
+  height: 38px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 @media screen and (width <= 1250px) {
   .login-left {
     display: none;

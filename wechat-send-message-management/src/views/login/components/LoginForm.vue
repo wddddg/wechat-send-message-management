@@ -18,6 +18,22 @@
         </template>
       </el-input>
     </el-form-item>
+    <el-form-item prop="code">
+      <el-input
+        v-model="loginForm.code"
+        auto-complete="off"
+        placeholder="验证码"
+        style="width: 63%"
+        @keyup.enter="login(loginFormRef)"
+      >
+        <template #prefix>
+          <svg-icon icon-class="validCode" class="el-input__icon input-icon" />
+        </template>
+      </el-input>
+      <div class="login-code">
+        <img :src="codeUrl" @click="getCode" />
+      </div>
+    </el-form-item>
   </el-form>
   <div class="login-btn">
     <el-button :icon="CircleClose" round size="large" @click="resetForm(loginFormRef)"> 重置 </el-button>
@@ -34,7 +50,7 @@ import { HOME_URL } from "@/config";
 import { getTimeState } from "@/utils";
 import { Login } from "@/api/interface";
 import { ElNotification } from "element-plus";
-import { loginApi } from "@/api/modules/login";
+import { loginApi, getCodeImg } from "@/api/modules/login";
 import { useUserStore } from "@/stores/modules/user";
 import { useTabsStore } from "@/stores/modules/tabs";
 import { useKeepAliveStore } from "@/stores/modules/keepAlive";
@@ -52,14 +68,19 @@ type FormInstance = InstanceType<typeof ElForm>;
 const loginFormRef = ref<FormInstance>();
 const loginRules = reactive({
   username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
 });
 
 const loading = ref(false);
 const loginForm = reactive<Login.ReqLoginForm>({
-  username: "",
-  password: ""
+  username: "admin",
+  password: "admin123",
+  code: "",
+  uuid: ""
 });
+
+const codeUrl = ref("");
 
 // login
 const login = (formEl: FormInstance | undefined) => {
@@ -69,8 +90,13 @@ const login = (formEl: FormInstance | undefined) => {
     loading.value = true;
     try {
       // 1.执行登录接口
-      const { data } = await loginApi({ ...loginForm, password: md5(loginForm.password) });
-      userStore.setToken(data.access_token);
+      try {
+        const { data } = await loginApi({ ...loginForm, password: md5(loginForm.password) });
+        userStore.setToken(data.access_token);
+      } catch (error) {
+        getCode();
+        return;
+      }
 
       // 2.添加动态路由
       await initDynamicRouter();
@@ -99,6 +125,15 @@ const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields();
 };
 
+const getCode = () => {
+  getCodeImg().then((res: any) => {
+    console.log(res);
+
+    codeUrl.value = "data:image/gif;base64," + res.img;
+    loginForm.uuid = res.uuid;
+  });
+};
+
 onMounted(() => {
   // 监听 enter 事件（调用登录）
   document.onkeydown = (e: KeyboardEvent) => {
@@ -108,6 +143,7 @@ onMounted(() => {
       login(loginFormRef.value);
     }
   };
+  getCode();
 });
 </script>
 
