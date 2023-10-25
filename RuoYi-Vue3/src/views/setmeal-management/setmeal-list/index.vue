@@ -49,8 +49,8 @@
           type="success"
           plain
           icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
+          :disabled="selectionList.length !== 1"
+          @click="handleUpdate(selectionList[0])"
           v-hasPermi="['system:user:edit']"
           >修改</el-button
         >
@@ -60,30 +60,10 @@
           type="danger"
           plain
           icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
+          :disabled="selectionList.length === 0"
+          @click="handleDeletes"
           v-hasPermi="['system:user:remove']"
           >删除</el-button
-        >
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="Upload"
-          @click="handleImport"
-          v-hasPermi="['system:user:import']"
-          >导入</el-button
-        >
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['system:user:export']"
-          >导出</el-button
         >
       </el-col>
       <right-toolbar
@@ -196,13 +176,13 @@
       v-model:limit="queryParams.pageSize"
       @pagination="getList"
     />
-    <SetmealListDialog v-model:value="showSetmealListDialog" :status="dialogStatus" />
+    <SetmealListDialog v-model:value="showSetmealListDialog" :status="dialogStatus" @sucess="refresh" :rewriteFormData="rewriteFormData" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { getList as getSetmealList } from "@/api/setmeal-management/setmeal-list/index.js";
+import { getList as getSetmealList, deleteSetmeal } from "@/api/setmeal-management/setmeal-list/index.js";
 import SetmealListDialog from "./components/SetmealListDialog.vue";
 
 const { proxy } = getCurrentInstance();
@@ -229,10 +209,11 @@ const setmealList = ref([]);
 const showSearch = ref(true);
 const total = ref(0)
 const showSetmealListDialog = ref(false)
-const dialogStatus = ref('add')
-
+const dialogStatus = ref('none')
+const rewriteFormData = ref({})
+const selectionList = ref([])
 const handleSelectionChange = (row) => {
-  console.log(row);
+  selectionList.value = row
 };
 
 const getList = () => {
@@ -247,23 +228,47 @@ const getList = () => {
     });
 };
 const handleDelete = (row) => {
-  console.log(row);
+  proxy.$modal.confirm('是否确认删除价格为"' + row.price + '"的数据项？').then(() => {
+    return deleteSetmeal([row.id]);
+  }).then(() => {
+    getList();
+    proxy.$modal.msgSuccess("删除成功");
+  })
 };
-
+const handleDeletes = () => {
+  const ids = selectionList.value.map((item) => item.id);
+  const prices = selectionList.value.map((item) => item.price);
+  proxy.$modal.confirm('是否确认删除价格为"' + prices + '"的数据项？').then(() => {
+    return deleteSetmeal(ids);
+  }).then(() => {
+    getList();
+    proxy.$modal.msgSuccess("删除成功");
+  })
+}
 const handleQuery = () => {
   getList();
 };
 
 const handleAdd = () => {
+  rewriteFormData.value = {}
   dialogStatus.value = 'add'
   showSetmealListDialog.value = true
 }
 /** 修改按钮操作 */
 const handleUpdate = (row) => {
+  rewriteFormData.value = row
   dialogStatus.value = 'edit'
   showSetmealListDialog.value = true
 };
+const resetQuery = () => {
+  dateRange.value = [];
+  proxy.resetForm("queryRef");
+  handleQuery();
+};
 
+const refresh = () => {
+  getList();
+}
 getList();
 </script>
 
