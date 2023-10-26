@@ -7,21 +7,25 @@
       v-show="showSearch"
       label-width="68px"
     >
-      <el-form-item label="价格" prop="price">
+      <el-form-item label="手机号" prop="phone">
         <el-input
-          v-model="queryParams.price"
-          placeholder="请输入价格"
+          v-model="queryParams.phone"
+          placeholder="请输入手机号"
           clearable
           style="width: 240px"
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="enable">
-        <el-select  v-model="queryParams.enable" placeholder="请输入选择" clearable @change="handleQuery">
-          <el-option v-for="item in enable_status" :key="item.id" :label="item.label" :value="item.value"></el-option>
-        </el-select>
+      <el-form-item label="用户名" prop="createBy">
+        <el-input
+          v-model="queryParams.createBy"
+          placeholder="请输入用户名"
+          clearable
+          style="width: 240px"
+          @keyup.enter="handleQuery"
+        />
       </el-form-item>
-      <el-form-item label="创建时间" style="width: 308px">
+      <el-form-item label="发送时间" style="width: 308px">
         <el-date-picker
           v-model="dateRange"
           value-format="YYYY-MM-DD"
@@ -39,7 +43,7 @@
       </el-form-item>
     </el-form>
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="primary"
           plain
@@ -70,7 +74,7 @@
           v-hasPermi="['system:user:remove']"
           >删除</el-button
         >
-      </el-col>
+      </el-col> -->
       <right-toolbar
         v-model:showSearch="showSearch"
         @queryTable="getList"
@@ -85,24 +89,24 @@
     >
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column
-        label="价格"
+        label="用户名"
         align="center"
-        key="price"
-        prop="price"
+        key="createBy"
+        prop="createBy"
         v-if="columns[0].visible"
       />
       <el-table-column
-        label="数量"
+        label="手机号"
         align="center"
-        key="number"
-        prop="number"
+        key="phone"
+        prop="phone"
         v-if="columns[1].visible"
       />
       <el-table-column
-        label="备注"
+        label="信息内容"
         align="center"
-        key="remark"
-        prop="remark"
+        key="informationContext"
+        prop="informationContext"
         v-if="columns[2].visible"
       />
       <el-table-column
@@ -181,17 +185,14 @@
       v-model:limit="queryParams.pageSize"
       @pagination="getList"
     />
-    <SetmealListDialog v-model:value="showSetmealListDialog" :status="dialogStatus" @sucess="refresh" :rewriteFormData="rewriteFormData" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { getList as getSetmealList, deleteSetmeal } from "@/api/setmeal-management/setmeal-list/index.js";
-import SetmealListDialog from "./components/SetmealListDialog.vue";
-
 const { proxy } = getCurrentInstance();
-const { enable_status } = proxy.useDict("enable_status");
+
 // 列显隐信息
 const columns = ref([
   { key: 0, label: `价格`, visible: true },
@@ -213,9 +214,6 @@ const loading = ref(false);
 const setmealList = ref([]);
 const showSearch = ref(true);
 const total = ref(0)
-const showSetmealListDialog = ref(false)
-const dialogStatus = ref('none')
-const rewriteFormData = ref({})
 const selectionList = ref([])
 const handleSelectionChange = (row) => {
   selectionList.value = row
@@ -223,7 +221,7 @@ const handleSelectionChange = (row) => {
 
 const getList = () => {
   loading.value = true;
-  getSetmealList(proxy.addDateRange(queryParams.value, dateRange.value))
+  getSetmealList(proxy.addDateRange(queryParams.value, dateRange.value, 'AccessTime'))
     .then((res) => {
       setmealList.value = res.rows;
       total.value = res.total;
@@ -252,18 +250,6 @@ const handleDeletes = () => {
 }
 const handleQuery = () => {
   getList();
-};
-
-const handleAdd = () => {
-  rewriteFormData.value = {}
-  dialogStatus.value = 'add'
-  showSetmealListDialog.value = true
-}
-/** 修改按钮操作 */
-const handleUpdate = (row) => {
-  rewriteFormData.value = row
-  dialogStatus.value = 'edit'
-  showSetmealListDialog.value = true
 };
 const resetQuery = () => {
   dateRange.value = [];

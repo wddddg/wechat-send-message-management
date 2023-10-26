@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getList(data) {
   return request({
-    url: '/setmeal/list',
+    url: '/management/setmeal/list',
     method: 'get',
     params: data
   })
@@ -10,7 +10,7 @@ export function getList(data) {
 
 export function addSetmeal(data) {
   return request({
-    url: '/setmeal/add',
+    url: '/management/setmeal/add',
     method: 'post',
     data
   })
@@ -18,7 +18,7 @@ export function addSetmeal(data) {
 
 export function updateSetmeal(data) {
   return request({
-    url: '/setmeal/update',
+    url: '/management/setmeal/update',
     method: 'put',
     data
   })
@@ -26,7 +26,7 @@ export function updateSetmeal(data) {
 
 export function deleteSetmeal(ids) {
   return request({
-    url: '/setmeal/' + ids,
+    url: '/management/setmeal/' + ids,
     method: 'delete'
   })
 }

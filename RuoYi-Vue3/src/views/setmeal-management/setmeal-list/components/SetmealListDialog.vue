@@ -23,8 +23,8 @@
         <el-switch
           v-model="form.enable"
           style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-          :active-value="0"
-          :inactive-value="1"
+          :active-value="1"
+          :inactive-value="0"
         />
       </el-form-item>
       <el-form-item label="套餐描述" prop="remark">
