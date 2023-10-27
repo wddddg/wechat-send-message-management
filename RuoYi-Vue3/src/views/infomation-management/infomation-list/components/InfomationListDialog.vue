@@ -13,22 +13,20 @@
       label-width="80px"
       class="demo-ruleForm"
     >
-      <el-form-item label="套餐价格" prop="price">
-        <el-input-number v-model="form.price" class="width-100percentage" />
+      <el-form-item label="用户名" prop="createBy">
+        <el-input v-model="form.createBy" disabled />
       </el-form-item>
-      <el-form-item label="套餐数量" prop="number">
-        <el-input-number v-model="form.number" class="width-100percentage" />
+      <el-form-item label="手机号" prop="phone">
+        <el-input v-model="form.phone" disabled />
       </el-form-item>
-      <el-form-item label="套餐状态" prop="enable">
-        <el-switch
-          v-model="form.enable"
-          style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-          :active-value="1"
-          :inactive-value="0"
-        />
+      <el-form-item label="是否匿名" prop="isAnonymity">
+        <el-input v-model="form.isAnonymity" disabled />
       </el-form-item>
-      <el-form-item label="套餐描述" prop="remark">
-        <el-input v-model="form.remark" type="textarea" :rows="4" />
+      <el-form-item label="用户名" prop="createBy">
+        <el-input v-model="form.createBy" disabled />
+      </el-form-item>
+      <el-form-item label="信息内容" prop="informationContext">
+        <el-input type="textarea" v-model="form.informationContext" />
       </el-form-item>
     </el-form>
 

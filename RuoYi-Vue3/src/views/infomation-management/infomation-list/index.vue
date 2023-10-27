@@ -25,6 +25,11 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select  v-model="queryParams.status" placeholder="请选择状态" clearable @change="handleQuery">
+          <el-option v-for="item in information_status" :key="item.id" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="发送时间" style="width: 308px">
         <el-date-picker
           v-model="dateRange"
@@ -43,16 +48,6 @@
       </el-form-item>
     </el-form>
     <el-row :gutter="10" class="mb8">
-      <!-- <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['system:user:add']"
-          >新增</el-button
-        >
-      </el-col>
       <el-col :span="1.5">
         <el-button
           type="success"
@@ -60,7 +55,7 @@
           icon="Edit"
           :disabled="selectionList.length !== 1"
           @click="handleUpdate(selectionList[0])"
-          v-hasPermi="['system:user:edit']"
+          v-hasPermi="['']"
           >修改</el-button
         >
       </el-col>
@@ -71,10 +66,10 @@
           icon="Delete"
           :disabled="selectionList.length === 0"
           @click="handleDeletes"
-          v-hasPermi="['system:user:remove']"
+          v-hasPermi="['']"
           >删除</el-button
         >
-      </el-col> -->
+      </el-col>
       <right-toolbar
         v-model:showSearch="showSearch"
         @queryTable="getList"
@@ -84,7 +79,7 @@
 
     <el-table
       v-loading="loading"
-      :data="setmealList"
+      :data="informationList"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="50" align="center" />
@@ -94,6 +89,8 @@
         key="createBy"
         prop="createBy"
         v-if="columns[0].visible"
+        width="120"
+        show-overflow-tooltip
       />
       <el-table-column
         label="手机号"
@@ -101,6 +98,7 @@
         key="phone"
         prop="phone"
         v-if="columns[1].visible"
+        width="120"
       />
       <el-table-column
         label="信息内容"
@@ -108,73 +106,100 @@
         key="informationContext"
         prop="informationContext"
         v-if="columns[2].visible"
+        show-overflow-tooltip
       />
       <el-table-column
         label="状态"
         align="center"
-        key="enable"
-        prop="enable"
+        key="status"
+        prop="status"
         v-if="columns[3].visible"
       >
         <template #default="scope">
-          <DictTag :options="enable_status" :value="scope && scope.row.enable"></DictTag>
+          <DictTag :options="information_status" :value="scope && scope.row.status"></DictTag>
         </template>
       </el-table-column>
       <el-table-column
-        label="创建人"
+        label="是否匿名"
         align="center"
-        key="createBy"
-        prop="createBy"
+        key="isAnonymity"
+        prop="isAnonymity"
         v-if="columns[4].visible"
+        width="160px"
+      >
+        <template #default="scope">
+          <DictTag :options="whether" :value="scope && scope.row.isAnonymity"></DictTag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="发送时间"
+        align="center"
+        key="accessTime"
+        prop="accessTime"
+        v-if="columns[5].visible"
+        width="160px"
+      />
+      <el-table-column
+        label="价格"
+        align="center"
+        key="price"
+        prop="price"
+        v-if="columns[6].visible"
+        width="160px"
       />
       <el-table-column
         label="创建时间"
         align="center"
         key="createTime"
         prop="createTime"
-        v-if="columns[5].visible"
-        width="160px"
-      />
-      <el-table-column
-        label="更新人"
-        align="center"
-        key="updateBy"
-        prop="updateBy"
-        v-if="columns[6].visible"
-      />
-      <el-table-column
-        label="更新时间"
-        align="center"
-        key="updateTime"
-        prop="updateTime"
         v-if="columns[7].visible"
         width="160px"
       />
       <el-table-column
         label="操作"
         align="center"
-        width="150"
+        width="400"
         class-name="small-padding fixed-width"
       >
         <template #default="scope">
-          <el-tooltip content="修改" placement="top">
-            <el-button
-              link
-              type="primary"
-              icon="Edit"
-              @click="handleUpdate(scope.row)"
-              v-hasPermi="['system:user:edit']"
-            ></el-button>
-          </el-tooltip>
-          <el-tooltip content="删除" placement="top">
-            <el-button
-              link
-              type="primary"
-              icon="Delete"
-              @click="handleDelete(scope.row)"
-              v-hasPermi="['system:user:remove']"
-            ></el-button>
-          </el-tooltip>
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="accessInformation(scope.row)"
+            v-hasPermi="['']"
+            :disabled="accessStatusDisabled(scope.row.status)"
+          >发送</el-button>
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="rejectInformation(scope.row)"
+            v-hasPermi="['']"
+            :disabled="accessStatusDisabled(scope.row.status)"
+          >驳回</el-button>
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleDetails(scope.row)"
+            v-hasPermi="['']"
+          >详情</el-button>
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['']"
+            :disabled="accessStatusDisabled(scope.row.status)"
+          >修改</el-button>
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['']"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -185,24 +210,29 @@
       v-model:limit="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <InfomationListDialog v-model:value="showInfomationListDialog" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { getList as getSetmealList, deleteSetmeal } from "@/api/setmeal-management/setmeal-list/index.js";
+import { getList as getInfomationList, deleteInfomation } from "@/api/infomation-management/infomation-list.js";
+import InfomationListDialog from "./components/InfomationListDialog.vue";
+
 const { proxy } = getCurrentInstance();
+const { information_status, whether } = proxy.useDict("information_status", "whether");
 
 // 列显隐信息
 const columns = ref([
-  { key: 0, label: `价格`, visible: true },
-  { key: 1, label: `数量`, visible: true },
-  { key: 2, label: `备注`, visible: true },
+  { key: 0, label: `用户名`, visible: true },
+  { key: 1, label: `手机号`, visible: true },
+  { key: 2, label: `信息内容`, visible: true },
   { key: 3, label: `状态`, visible: true },
-  { key: 4, label: `创建人`, visible: true },
-  { key: 5, label: `创建时间`, visible: true },
-  { key: 6, label: `更新人`, visible: true },
-  { key: 7, label: `更新时间`, visible: true },
+  { key: 4, label: `是否匿名`, visible: true },
+  { key: 5, label: `发送时间`, visible: true },
+  { key: 6, label: `价格`, visible: true },
+  { key: 7, label: `创建时间`, visible: true },
 ]);
 
 const queryParams = ref({
@@ -211,28 +241,58 @@ const queryParams = ref({
 });
 const dateRange = ref([]);
 const loading = ref(false);
-const setmealList = ref([]);
+const informationList = ref([]);
 const showSearch = ref(true);
 const total = ref(0)
 const selectionList = ref([])
+const showInfomationListDialog = ref(false);
+
 const handleSelectionChange = (row) => {
   selectionList.value = row
 };
 
 const getList = () => {
   loading.value = true;
-  getSetmealList(proxy.addDateRange(queryParams.value, dateRange.value, 'AccessTime'))
+  getInfomationList(proxy.addDateRange(queryParams.value, dateRange.value, 'AccessTime'))
     .then((res) => {
-      setmealList.value = res.rows;
+      informationList.value = res.rows;
       total.value = res.total;
     })
     .finally(() => {
       loading.value = false;
     });
 };
+const handleQuery = () => {
+  getList();
+};
+const resetQuery = () => {
+  dateRange.value = [];
+  proxy.resetForm("queryRef");
+  handleQuery();
+};
+const accessStatusDisabled = (status) => {
+  return status === 2 ? false : true;
+}
+
+const accessInformation = (data) => {
+  console.log(data);
+}
+
+const rejectInformation = (data) => {
+  console.log(data);
+}
+
+const handleUpdate = (data) => {
+  showInfomationListDialog.value = true;
+}
+
+const handleDetails = (data) => {
+  showInfomationListDialog.value = true;
+}
+
 const handleDelete = (row) => {
   proxy.$modal.confirm('是否确认删除价格为"' + row.price + '"的数据项？').then(() => {
-    return deleteSetmeal([row.id]);
+    return deleteInfomation([row.id]);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
@@ -242,24 +302,17 @@ const handleDeletes = () => {
   const ids = selectionList.value.map((item) => item.id);
   const prices = selectionList.value.map((item) => item.price);
   proxy.$modal.confirm('是否确认删除价格为"' + prices + '"的数据项？').then(() => {
-    return deleteSetmeal(ids);
+    return deleteInfomation(ids);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
   })
 }
-const handleQuery = () => {
-  getList();
-};
-const resetQuery = () => {
-  dateRange.value = [];
-  proxy.resetForm("queryRef");
-  handleQuery();
-};
 
 const refresh = () => {
   getList();
 }
+
 getList();
 </script>
 

@@ -17,7 +17,7 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="enable">
-        <el-select  v-model="queryParams.enable" placeholder="请输入选择" clearable @change="handleQuery">
+        <el-select  v-model="queryParams.enable" placeholder="请选择状态" clearable @change="handleQuery">
           <el-option v-for="item in enable_status" :key="item.id" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -45,7 +45,7 @@
           plain
           icon="Plus"
           @click="handleAdd"
-          v-hasPermi="['system:user:add']"
+          v-hasPermi="['']"
           >新增</el-button
         >
       </el-col>
@@ -56,7 +56,7 @@
           icon="Edit"
           :disabled="selectionList.length !== 1"
           @click="handleUpdate(selectionList[0])"
-          v-hasPermi="['system:user:edit']"
+          v-hasPermi="['']"
           >修改</el-button
         >
       </el-col>
@@ -67,7 +67,7 @@
           icon="Delete"
           :disabled="selectionList.length === 0"
           @click="handleDeletes"
-          v-hasPermi="['system:user:remove']"
+          v-hasPermi="['']"
           >删除</el-button
         >
       </el-col>
@@ -159,7 +159,7 @@
               type="primary"
               icon="Edit"
               @click="handleUpdate(scope.row)"
-              v-hasPermi="['system:user:edit']"
+              v-hasPermi="['']"
             ></el-button>
           </el-tooltip>
           <el-tooltip content="删除" placement="top">
@@ -168,7 +168,7 @@
               type="primary"
               icon="Delete"
               @click="handleDelete(scope.row)"
-              v-hasPermi="['system:user:remove']"
+              v-hasPermi="['']"
             ></el-button>
           </el-tooltip>
         </template>
@@ -187,7 +187,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { getList as getSetmealList, deleteSetmeal } from "@/api/setmeal-management/setmeal-list/index.js";
+import { getList as getSetmealList, deleteSetmeal } from "@/api/setmeal-management/setmeal-list.js";
 import SetmealListDialog from "./components/SetmealListDialog.vue";
 
 const { proxy } = getCurrentInstance();
