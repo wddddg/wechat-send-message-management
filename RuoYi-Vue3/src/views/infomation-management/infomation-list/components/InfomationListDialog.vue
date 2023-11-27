@@ -19,18 +19,24 @@
       <el-form-item label="手机号" prop="phone">
         <el-input v-model="form.phone" disabled />
       </el-form-item>
-      <el-form-item label="是否匿名" prop="isAnonymity">
-        <el-input v-model="form.isAnonymity" disabled />
+      <el-form-item label="价格" prop="price">
+        <el-input v-model="form.price" disabled />
       </el-form-item>
-      <el-form-item label="用户名" prop="createBy">
-        <el-input v-model="form.createBy" disabled />
+      <el-form-item label="是否匿名" prop="isAnonymity">
+        <el-switch
+          v-model="form.isAnonymity"
+          style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+          :active-value="1"
+          :inactive-value="0"
+          disabled
+        />
       </el-form-item>
       <el-form-item label="信息内容" prop="informationContext">
-        <el-input type="textarea" v-model="form.informationContext" />
+        <el-input type="textarea" v-model="form.informationContext" :disabled="informationContextDisabled" :rows="4" />
       </el-form-item>
     </el-form>
 
-    <template #footer>
+    <template #footer v-if="!informationContextDisabled">
       <span class="dialog-footer">
         <el-button @click="handleClose">取消</el-button>
         <el-button type="primary" @click="confirm"> 确认 </el-button>
@@ -41,21 +47,23 @@
 
 <script setup>
 import { computed, watch } from "vue";
-import { addSetmeal, updateSetmeal } from "@/api/setmeal-management/setmeal-list.js";
+import { updateInfomation } from "@/api/infomation-management/infomation-list.js";
 import { ElMessage } from 'element-plus'
 
 const props = defineProps(["value", "status", "rewriteFormData"]);
 const emit = defineEmits(["update:value"]);
 const title = computed(() => {
-  return (props.status === "add" ? "新增" : "编辑") + "套餐";
+  return (props.status === "edit" ? "编辑" : "详情") + "信息";
 });
 
-const form = ref({ id: null, price: 0, number: 0, enable: 0, remark: "" });
+const form = ref({ id: null, createBy: null, isAnonymity: null, phone: null, informationContext: null, price: null });
 const rules = {
-  price: [{ required: true, message: "请输入套餐价格", trigger: "blur" }],
-  number: [{ required: true, message: "请输入套餐数量", trigger: "blur" }]
+  informationContext: [{ required: true, message: "请输入信息内容", trigger: "change" }]
 };
 const formRef = ref(null);
+const informationContextDisabled = computed(() => {
+  return props.status === "edit" ? false : true;
+})
 
 const confirm = async () => {
   if (!formRef.value) return;
@@ -63,17 +71,10 @@ const confirm = async () => {
     if (!valid) {
       return;
     }
-    if (props.status === "add") {
-      await addSetmeal(form.value).then(res => {
+    if (props.status === "edit") {
+      await updateInfomation(form.value).then(res => {
         ElMessage({
-          message: '新增套餐成功',
-          type: 'success'
-        })
-      })
-    } else if (props.status === "edit") {
-      await updateSetmeal(form.value).then(res => {
-        ElMessage({
-          message: '编辑套餐成功',
+          message: '编辑信息成功',
           type: 'success'
         })
       })
@@ -84,7 +85,7 @@ const confirm = async () => {
 };
 
 const handleClose = () => {
-  form.value = { id: null, price: 0, number: 0, enable: 0, remark: ""}
+  form.value = { id: null, createBy: null, isAnonymity: null, phone: null, informationContext: null, price: null }
   formRef.value.resetFields()
   emit("update:value", false);
 };
@@ -93,7 +94,7 @@ const handleSucess = () => {
 }
 
 watch(() => props.value, val => {
-  if (val && props.status === "edit") {
+  if (val) {
     for (const key in form.value) {
       if (props.rewriteFormData.hasOwnProperty(key) || props.rewriteFormData.hasOwnProperty("id")) {
         form.value[key] = props.rewriteFormData[key]

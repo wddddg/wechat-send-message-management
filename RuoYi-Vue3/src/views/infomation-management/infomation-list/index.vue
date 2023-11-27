@@ -211,7 +211,7 @@
       @pagination="getList"
     />
 
-    <InfomationListDialog v-model:value="showInfomationListDialog" />
+    <InfomationListDialog v-model:value="showInfomationListDialog" :status="dialogStatus" @sucess="refresh" :rewriteFormData="rewriteFormData" />
   </div>
 </template>
 
@@ -246,6 +246,8 @@ const showSearch = ref(true);
 const total = ref(0)
 const selectionList = ref([])
 const showInfomationListDialog = ref(false);
+const rewriteFormData = ref({})
+const dialogStatus = ref("none");
 
 const handleSelectionChange = (row) => {
   selectionList.value = row
@@ -283,15 +285,19 @@ const rejectInformation = (data) => {
 }
 
 const handleUpdate = (data) => {
+  rewriteFormData.value = data
+  dialogStatus.value = "edit"
   showInfomationListDialog.value = true;
 }
 
 const handleDetails = (data) => {
+  rewriteFormData.value = data
+  dialogStatus.value = "details"
   showInfomationListDialog.value = true;
 }
 
 const handleDelete = (row) => {
-  proxy.$modal.confirm('是否确认删除价格为"' + row.price + '"的数据项？').then(() => {
+  proxy.$modal.confirm('是否确认删除信息内容为"' + row.informationContext + '"的数据项？').then(() => {
     return deleteInfomation([row.id]);
   }).then(() => {
     getList();
@@ -300,8 +306,8 @@ const handleDelete = (row) => {
 };
 const handleDeletes = () => {
   const ids = selectionList.value.map((item) => item.id);
-  const prices = selectionList.value.map((item) => item.price);
-  proxy.$modal.confirm('是否确认删除价格为"' + prices + '"的数据项？').then(() => {
+  const informations = selectionList.value.map((item) => item.informationContext);
+  proxy.$modal.confirm('是否确认删除信息内容为"' + informations + '"的数据项？').then(() => {
     return deleteInfomation(ids);
   }).then(() => {
     getList();
