@@ -59,39 +59,48 @@
       <el-table-column
         label="姓名"
         align="center"
-        key="name"
-        prop="name"
+        key="userName"
+        prop="userName"
         v-if="columns[0].visible"
         show-overflow-tooltip
       />
       <el-table-column
         label="手机号"
         align="center"
-        key="phone"
-        prop="phone"
+        key="userPhone"
+        prop="userPhone"
         v-if="columns[1].visible"
       />
       <el-table-column
         label="头像"
         align="center"
-        key="avatar"
-        prop="avatar"
+        key="userAvatar"
+        prop="userAvatar"
         v-if="columns[5].visible"
-      />
+      >
+        <template #default="scope">
+          <ImagePreview :src="scope.row.userAvatar" :width="60" :height="60" />
+        </template>
+      </el-table-column>
       <el-table-column
         label="信息内容"
         align="center"
-        key="avatar"
-        prop="avatar"
+        key="informationContent"
+        prop="informationContent"
         v-if="columns[5].visible"
+        show-overflow-tooltip
       />
       <el-table-column
         label="信息状态"
         align="center"
-        key="avatar"
-        prop="avatar"
+        key="informationStatus"
+        prop="informationStatus"
         v-if="columns[5].visible"
-      />
+      >
+        <template #default="scope">
+          <DictTag :options="information_status" :value="scope && scope.row.informationStatus"></DictTag>
+        </template>
+      </el-table-column>
       <el-table-column
         label="消费金额"
         align="center"
@@ -122,7 +131,7 @@ import { ref } from "vue";
 import { getList as getConsumptionRecordt } from "@/api/wechat/user-consumption-record.js";
 
 const { proxy } = getCurrentInstance();
-const { sys_user_sex } = proxy.useDict("sys_user_sex");
+const { information_status } = proxy.useDict("information_status");
 
 // 列显隐信息
 const columns = ref([

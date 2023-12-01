@@ -246,7 +246,7 @@ const showSearch = ref(true);
 const total = ref(0)
 const selectionList = ref([])
 const showInfomationListDialog = ref(false);
-const rewriteFormData = ref({})
+let rewriteFormData = {}
 const dialogStatus = ref("none");
 
 const handleSelectionChange = (row) => {
@@ -285,13 +285,13 @@ const rejectInformation = (data) => {
 }
 
 const handleUpdate = (data) => {
-  rewriteFormData.value = data
+  rewriteFormData = data
   dialogStatus.value = "edit"
   showInfomationListDialog.value = true;
 }
 
 const handleDetails = (data) => {
-  rewriteFormData.value = data
+  rewriteFormData = data
   dialogStatus.value = "details"
   showInfomationListDialog.value = true;
 }

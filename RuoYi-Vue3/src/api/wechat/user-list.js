@@ -15,10 +15,3 @@ export function updateWechatUser(data) {
     data
   })
 }
-
-export function deleteSetmeal(ids) {
-  return request({
-    url: '/management/wechat-user/' + ids,
-    method: 'delete'
-  })
-}

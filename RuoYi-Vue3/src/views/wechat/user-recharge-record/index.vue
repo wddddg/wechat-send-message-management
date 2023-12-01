@@ -77,7 +77,11 @@
         key="userAvatar"
         prop="userAvatar"
         v-if="columns[5].visible"
-      />
+      >
+        <template #default="scope">
+          <ImagePreview :src="scope.row.userAvatar" :width="60" :height="60" />
+        </template>
+      </el-table-column>
       <el-table-column
         label="充值金额"
         align="center"

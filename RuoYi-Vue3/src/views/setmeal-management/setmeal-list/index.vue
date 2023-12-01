@@ -215,7 +215,7 @@ const showSearch = ref(true);
 const total = ref(0)
 const showSetmealListDialog = ref(false)
 const dialogStatus = ref('none')
-const rewriteFormData = ref({})
+let rewriteFormData = {}
 const selectionList = ref([])
 const handleSelectionChange = (row) => {
   selectionList.value = row
@@ -255,13 +255,13 @@ const handleQuery = () => {
 };
 
 const handleAdd = () => {
-  rewriteFormData.value = {}
+  rewriteFormData = {}
   dialogStatus.value = 'add'
   showSetmealListDialog.value = true
 }
 /** 修改按钮操作 */
 const handleUpdate = (row) => {
-  rewriteFormData.value = row
+  rewriteFormData = row
   dialogStatus.value = 'edit'
   showSetmealListDialog.value = true
 };

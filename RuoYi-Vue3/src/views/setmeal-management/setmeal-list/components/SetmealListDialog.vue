@@ -65,12 +65,14 @@ const confirm = async () => {
     if (!valid) {
       return;
     }
+    let isError = true
     if (props.status === "add") {
       await addSetmeal(form.value).then(res => {
         ElMessage({
           message: '新增套餐成功',
           type: 'success'
         })
+        isError = false
       })
     } else if (props.status === "edit") {
       await updateSetmeal(form.value).then(res => {
@@ -78,8 +80,10 @@ const confirm = async () => {
           message: '编辑套餐成功',
           type: 'success'
         })
+        isError = false
       })
     }
+    if (isError) return
     handleClose();
     handleSucess();
   });

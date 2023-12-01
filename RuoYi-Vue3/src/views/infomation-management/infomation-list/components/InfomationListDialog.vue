@@ -77,10 +77,10 @@ const confirm = async () => {
           message: '编辑信息成功',
           type: 'success'
         })
+        handleClose();
+        handleSucess();
       })
     }
-    handleClose();
-    handleSucess();
   });
 };
 

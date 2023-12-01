@@ -126,7 +126,11 @@
         key="avatar"
         prop="avatar"
         v-if="columns[5].visible"
-      />
+      >
+        <template #default="scope">
+          <ImagePreview :src="scope.row.avatar" :width="60" :height="60" />
+        </template>
+      </el-table-column>
       <el-table-column
         label="注册时间"
         align="center"
@@ -160,15 +164,19 @@
       v-model:limit="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <UserListDialog v-model:value="showUserListDialog" :rewriteFormData="rewriteFormData" :dict="dicts" @sucess="refresh" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { getList as getWechatUserList } from "@/api/wechat/user-list.js";
+import UserListDialog from './components/UserListDialog.vue'
 
 const { proxy } = getCurrentInstance();
 const { sys_user_sex } = proxy.useDict("sys_user_sex");
+const dicts = { sys_user_sex }
 
 // 列显隐信息
 const columns = ref([
@@ -193,6 +201,9 @@ const showSearch = ref(true);
 const total = ref(0)
 const selectionList = ref([])
 
+const showUserListDialog = ref(false)
+let rewriteFormData = {}
+
 const handleSelectionChange = (row) => {
   selectionList.value = row
 };
@@ -216,6 +227,15 @@ const resetQuery = () => {
   proxy.resetForm("queryRef");
   handleQuery();
 };
+
+const handleUpdate = (row) => {
+  showUserListDialog.value = true
+  rewriteFormData = row
+}
+
+const refresh = () => {
+  getList();
+}
 
 getList();
 </script>
